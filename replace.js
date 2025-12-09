@@ -257,6 +257,25 @@ if (!stockValue) return 'x'; // kein stock gefunden
 return stockValue;
 }
 
+function replaceStockInfo(){
+  stockValue = searchStockInfo();
+
+  const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
+
+  let current;
+  while (current = walker.nextNode()) {
+    const newText = current.nodeValue.replace('STOCK', (match, stock) => {
+      // nur ersetzen, wenn die ID in der Map existiert
+      return `${match}: ${stockValue}`;
+    });
+
+    if (newText !== current.nodeValue) {
+      current.nodeValue = newText;
+    }
+  }
+
+}
+
 
 
 // Initiale Verzögerung (10 Sekunden)
@@ -267,5 +286,5 @@ return stockValue;
 // Alle 60 Sekunden erneut ausführen
 setInterval(() => {
   replaceDistilleryCodes();
-  //searchStockInfo();
+  replaceStockInfo()
 }, 1000);
