@@ -223,6 +223,8 @@ const distilleryMap_rum = {
 
 function replaceDistilleryCodes(node = document.body) {
   const regex_singlemalt = /(?<!: )(?<![\d$€£¥])\b(\d{1,3})\.(\d+)\b(?![\d$€£¥%])/g;
+
+stockValue = searchStockInfo();
   const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
 
   let current;
@@ -233,7 +235,7 @@ function replaceDistilleryCodes(node = document.body) {
         return match; // keine Änderung
       }
       const name = distilleryMap[code];
-      return `${name}: ${code}.${bottle}`;
+      return `${name}: ${code}.${bottle}-${stockValue}`;
     });
 
     if (newText !== current.nodeValue) {
@@ -243,38 +245,18 @@ function replaceDistilleryCodes(node = document.body) {
 }
 
 
-function appendStockInfo() {
-  const html = document.documentElement.innerHTML;
+function searchStockInfo() {
 
-  // Stock-Zahl aus dem Quelltext auslesen
-  const stockMatch = html.match(/"stock"\s*:\s*(\d+)/);
-  if (!stockMatch) return;  // kein stock: X gefunden
-  const stockValue = stockMatch[1];
+    const html = document.documentElement.innerHTML;
 
-  // Texte, die verändert werden sollen
-  const labels = ["IN STOCK", "LIMITED STOCK"];
+    // Stock-Zahl aus dem HTML holen
+    const stockMatch = html.match(/"stock"\s*:\s*(\d+)/);
+    const stockValue = stockMatch ? stockMatch[1] : null;
 
-  labels.forEach(label => {
-    // Alle Text-Nodes laufen, die "IN STOCK" oder "LIMITED STOCK" enthalten
-    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-
-    let node;
-    while ((node = walker.nextNode())) {
-      const text = node.nodeValue;
-
-      // Prüfen, ob der jeweilige Text vorhanden ist
-      if (text.includes(label)) {
-
-        // prüfen, ob die Zahl schon angehängt wurde → sonst mehrfach
-        const regexAlready = new RegExp(label + "\\s+" + stockValue);
-        if (regexAlready.test(text)) continue;
-
-        // Falls Text z.B. "IN STOCK" ist, erweitern zu "IN STOCK 66"
-        node.nodeValue = text.replace(label, `${label} ${stockValue}`);
-      }
-    }
-  });
+if (!stockValue) return 'x'; // kein stock gefunden
+return stockValue;
 }
+
 
 
 // Initiale Verzögerung (10 Sekunden)
@@ -285,5 +267,5 @@ function appendStockInfo() {
 // Alle 60 Sekunden erneut ausführen
 setInterval(() => {
   replaceDistilleryCodes();
-  appendStockInfo();
+  //searchStockInfo();
 }, 1000);
