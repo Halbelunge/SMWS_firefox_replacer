@@ -257,14 +257,14 @@ if (!stockValue) return 'x'; // kein stock gefunden
 return stockValue;
 }
 
-function replaceStockInfo(){
+function replaceStockInfo(node = document.body){
   stockValue = searchStockInfo();
 
   const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
 
   let current;
   while (current = walker.nextNode()) {
-    const newText = current.nodeValue.replace('STOCK', (match, stock) => {
+    const newText = current.nodeValue.replace(/STOCK/g, match => {
       // nur ersetzen, wenn die ID in der Map existiert
       return `${match}: ${stockValue}`;
     });
