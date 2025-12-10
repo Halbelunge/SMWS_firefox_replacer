@@ -257,12 +257,18 @@ if (!stockValue) return ""; // kein stock gefunden
 return ': ' + stockValue;
 }
 
+function domContainsText(value){
+  return document.documentElement.textContent.includes(value);
+}
+
 function replaceStockInfo(node = document.body){
   const stockValue = searchStockInfo();
 
   const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
+  const eventKeyword = /"ps_product_category\":[\"Events/i
 
   let current;
+  let current_eventKeyword;
   while (current = walker.nextNode()) {
     const newText = current.nodeValue.replace(/stock(?!:)/i, match => {
       return `${match}${stockValue}`;
@@ -270,6 +276,13 @@ function replaceStockInfo(node = document.body){
 
     if (newText !== current.nodeValue) {
       current.nodeValue = newText;
+    }else{
+        if(domContainsText('"ps_product_category\":[\"Events')) {
+          while (current = walker.nextNode()) {
+              const newText = current.nodeValue.replace(/time(?!:)/i, match => {
+                return `stock: ${stockValue}  -  ${match}`;
+          });
+        }
     }
   }
 
