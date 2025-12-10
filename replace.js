@@ -235,7 +235,7 @@ stockValue = searchStockInfo();
         return match; // keine Änderung
       }
       const name = distilleryMap[code];
-      return `${name}: ${code}.${bottle}-${stockValue}`;
+      return `${name}: ${code}.${bottle}`;
     });
 
     if (newText !== current.nodeValue) {
@@ -253,20 +253,19 @@ function searchStockInfo() {
     const stockMatch = html.match(/"stock"\s*:\s*(\d+)/);
     const stockValue = stockMatch ? stockMatch[1] : null;
 
-if (!stockValue) return 'x'; // kein stock gefunden
-return stockValue;
+if (!stockValue) return ""; // kein stock gefunden
+return ': ' + stockValue;
 }
 
 function replaceStockInfo(node = document.body){
-  stockValue = searchStockInfo();
+  const stockValue = searchStockInfo();
 
   const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
 
   let current;
   while (current = walker.nextNode()) {
-    const newText = current.nodeValue.replace(/STOCK/g, match => {
-      // nur ersetzen, wenn die ID in der Map existiert
-      return `${match}: ${stockValue}`;
+    const newText = current.nodeValue.replace(/stock(?!:)/i, match => {
+      return `${match}${stockValue}`;
     });
 
     if (newText !== current.nodeValue) {
