@@ -265,10 +265,11 @@ function replaceStockInfo(node = document.body){
   const stockValue = searchStockInfo();
 
   const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
+  const walker_eventSearch = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
   //const eventKeyword = /"ps_product_category\":[\"Events/i
 
   let current;
-  let current_eventKeyword;
+  let current_eventSearch;
   while (current = walker.nextNode()) {
     const newText = current.nodeValue.replace(/stock(?!:)/i, match => {
       return `${match}${stockValue}`;
@@ -278,10 +279,13 @@ function replaceStockInfo(node = document.body){
       current.nodeValue = newText;
     }else{
         if(domContainsText('"ps_product_category\":[\"Events')) {
-          while (current = walker.nextNode()) {
-              const newText = current.nodeValue.replace(/time(?!:)/i, match => {
+          while (current_eventSearch = walker_eventSearch.nextNode()) {
+              const newText = current_eventSearch.nodeValue.replace(/time(?!:)/i, match => {
                 return `stock: ${stockValue}  -  ${match}`;
               });
+          }
+          if(newText !== current_eventSearch.nodeValue){
+            current_eventSearch.nodeValue = newText;
           }
         }
     }
