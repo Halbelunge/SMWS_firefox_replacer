@@ -221,6 +221,8 @@ const distilleryMap_rum = {
   "R14": "Uitvlugt"
 };
 
+const stock_checked = 0;
+
 function replaceDistilleryCodes(node = document.body) {
   const regex_singlemalt = /(?<!: )(?<![\d$€£¥])\b(\d{1,3})\.(\d+)\b(?![\d$€£¥%])/g;
 
@@ -262,11 +264,13 @@ function domContainsText(value){
 }
 
 function replaceStockInfo(node = document.body){
+  if(stock_checked == 1) return;
   const stockValue = searchStockInfo();
 
   const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
   const walker_eventSearch = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
   //const eventKeyword = /"ps_product_category\":[\"Events/i
+  const isEvent = domContainsText('"ps_product_category\":[\"Events');
 
   let current;
   let current_eventSearch;
@@ -277,15 +281,19 @@ function replaceStockInfo(node = document.body){
 
     if (newText !== current.nodeValue) {
       current.nodeValue = newText;
+      stock_checked = 1;
+      return;
     }else{
-        if(domContainsText('"ps_product_category\":[\"Events')) {
+        if(isEvent) {
           while (current_eventSearch = walker_eventSearch.nextNode()) {
               const newText = current_eventSearch.nodeValue.replace(/time(?!:)/i, match => {
                 return `stock: ${stockValue}  -  ${match}`;
               });
-          }
-          if(newText !== current_eventSearch.nodeValue){
-            current_eventSearch.nodeValue = newText;
+              if(newText !== current_eventSearch.nodeValue){
+                current_eventSearch.nodeValue = newText;
+                stock_checked = 1;
+                return;
+              }
           }
         }
     }
