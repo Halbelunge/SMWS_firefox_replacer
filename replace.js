@@ -118,7 +118,7 @@ const distilleryMap = {
   "117": "Cooley (Unpeated)",
   "118": "Cooley / Connemara(Peated)",
   "119": "Yamazuki (Japan)",
-  "120": "Hakushu (Japan",
+  "120": "Hakushu (Japan)",
   "121": "Isle of Aeean",
   "122": "Loch Lomand (Croftengea)",
   "123": "Glengoyne",
@@ -281,7 +281,8 @@ function replaceStockInfo(node = document.body){
           while (current = walker.nextNode()) {
               const newText = current.nodeValue.replace(/time(?!:)/i, match => {
                 return `stock: ${stockValue}  -  ${match}`;
-          });
+              });
+          }
         }
     }
   }
