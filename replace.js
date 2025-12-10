@@ -265,7 +265,7 @@ function replaceStockInfo(node = document.body){
   const stockValue = searchStockInfo();
 
   const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
-  const eventKeyword = /"ps_product_category\":[\"Events/i
+  //const eventKeyword = /"ps_product_category\":[\"Events/i
 
   let current;
   let current_eventKeyword;
@@ -298,5 +298,5 @@ function replaceStockInfo(node = document.body){
 // Alle 60 Sekunden erneut ausführen
 setInterval(() => {
   replaceDistilleryCodes();
-  replaceStockInfo()
+  replaceStockInfo();
 }, 1000);
