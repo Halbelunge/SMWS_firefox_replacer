@@ -162,7 +162,7 @@ const distilleryMap = {
   "161": "Nc'nean Distillery",
   "162": "Isle of Raasay",	
   "163": "Isle of Harris Distillery",
-  "164": "Penderyb (double distilled)",
+  "164": "Penderyn (double distilled)",
   "165": "Wolfburn (peated)"
 };
 
@@ -305,7 +305,7 @@ function replaceStockInfo(node = document.body){
   let current_eventSearch;
   if(!isEvent){
     while (current = walker.nextNode()) {
-      const newText = current.nodeValue.replace(/stock(?!:)/i, match => {
+      const newText = current.nodeValue.replace(/stock(?!(?::|\s{2}-))/i, match => {  // /stock(?!:)/i
         if(stockValue > 0){
           return `${match}${stockValue}`;
         }else{
