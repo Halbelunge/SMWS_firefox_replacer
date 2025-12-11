@@ -290,52 +290,51 @@ function domContainsText(value){
   return document.documentElement.textContent.includes(value);
 }
 
-function replaceStockInfo(node = document.body){
-  //if(stock_checked == 1) return;
-  const stockValue = searchStockInfo();
-  const valueValue = searchValueInfo();
-  const currencyValue = searchCurrencyInfo();
+function replaceStockInfo(node = document.body) {
+    //if(stock_checked == 1) return;
+    const stockValue = searchStockInfo();
+    const valueValue = searchValueInfo();
+    const currencyValue = searchCurrencyInfo();
 
-  const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
-  const walker_eventSearch = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
-  //const eventKeyword = /"ps_product_category\":[\"Events/i
-  const isEvent = domContainsText('\":[\"Events');
+    const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
+    const walker_eventSearch = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
+    //const eventKeyword = /"ps_product_category\":[\"Events/i
+    const isEvent = domContainsText('\":[\"Events');
 
-  let current;
-  let current_eventSearch;
-  if(!isEvent){
-    while (current = walker.nextNode()) {
-      const newText = current.nodeValue.replace(/stock(?!(?::|\s{2}-))/i, match => {  // /stock(?!:)/i
-        if(stockValue > 0){
-          return `${match}${stockValue}`;
-        }else{
-            if(stockValue == 0){
-              return `${match}: - old price: ${valueValue}${currencyValue}`;  //regex anpassen um das : nach match entfernen zu können. auf \s\s- filtern
-            }else return "";
+    let current;
+    let current_eventSearch;
+    if (!isEvent) {
+        while (current = walker.nextNode()) {
+            const newText = current.nodeValue.replace(/stock(?!(?::|\s{2}-))/i, match => {  // /stock(?!:)/i
+                if (stockValue > 0) {
+                    return `${match}${stockValue}`;
+                } else {
+                    if (stockValue == 0) {
+                        return `${match}: - old price: ${valueValue}${currencyValue}`;  //regex anpassen um das : nach match entfernen zu können. auf \s\s- filtern
+                    } else return "";
+                }
+            });
+
+            if (newText !== current.nodeValue) {
+                current.nodeValue = newText;
+                //stock_checked = 1;
+                return;
+            }
         }
-      });
-  
-      if (newText !== current.nodeValue) {
-        current.nodeValue = newText;
-        //stock_checked = 1;
-        return;
-      }
-    }else{
+    }else {
         //if(isEvent) {
-          while (current_eventSearch = walker_eventSearch.nextNode()) {
-              const newText = current_eventSearch.nodeValue.replace(/(?<!-\s)time:/i, match => {
+        while (current_eventSearch = walker_eventSearch.nextNode()) {
+            const newText = current_eventSearch.nodeValue.replace(/(?<!-\s)time:/i, match => {
                 return `seats${stockValue}  - ${match}`;
-              });
-              if(newText !== current_eventSearch.nodeValue){
+            });
+            if (newText !== current_eventSearch.nodeValue) {
                 current_eventSearch.nodeValue = newText;
                 //stock_checked = 1;
                 return;
-              }
-          }
+            }
+        }
         //}
     }
-  }
-
 }
 
 
